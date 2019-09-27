@@ -36,17 +36,30 @@ function expressionCalculator(expr) {
   };
 
   const evalNoBrackets = expr => {
+    if (!expr.match(/[\+\-\*\/]/g)) {
+      console.log("no signs", expr);
+      return +expr;
+    }
+
     const adds = expr.split("+");
+    console.log("adds:", adds);
     const addsResult = adds.reduce((acc, el) => evalNoBrackets(acc) + evalNoBrackets(el));
+    console.log("addsResult:", addsResult);
 
     const subs = expr.split("-");
+    console.log("subs:", subs);
     const subsResult = subs.reduce((acc, el) => evalNoBrackets(acc) - evalNoBrackets(el));
+    console.log("subsResult:", subsResult);
 
     const multipliers = expr.split("*");
+    console.log("multipliers:", multipliers);
     const muliplyResult = multipliers.reduce((acc, el) => evalNoBrackets(acc) * evalNoBrackets(el));
+    console.log("muliplyResult:", muliplyResult);
 
     const dividers = expr.split("/");
+    console.log("dividers:", dividers);
     const divideResult = dividers.reduce((acc, el) => evalNoBrackets(acc) / evalNoBrackets(el));
+    console.log("divideResult:", divideResult);
   };
 
   const trimSigns = expr => {
@@ -79,7 +92,7 @@ function expressionCalculator(expr) {
 }
 
 const yy = expressionCalculator("1 * (5 +    6 ) / ( 3-(    9+0) *3)");
-console.log(yy);
+console.log("типа ответ:", yy);
 console.log(eval("1 * (5 +    6 ) / ( 3-(    9+0) *3)"));
 
 // module.exports = {
