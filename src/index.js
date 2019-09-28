@@ -35,7 +35,12 @@ function expressionCalculator(expr) {
     return [expr.slice(opened + 1, closed), opened, closed];
   };
 
-  const evalNoBrackets = expr => {
+  const evalNoBrackets = (expr, blankExpr) => {
+    console.log("!!!!!!!!!!!!!!!!!!!! expr", `--${expr}--`);
+    if (expr === "") {
+      return blankExpr;
+    }
+
     if (!expr.match(/[\+\-\*\/]/g)) {
       console.log("no signs", expr);
       return +expr;
@@ -43,23 +48,41 @@ function expressionCalculator(expr) {
 
     const adds = expr.split("+");
     console.log("adds:", adds);
-    const addsResult = adds.reduce((acc, el) => evalNoBrackets(acc) + evalNoBrackets(el));
-    console.log("addsResult:", addsResult);
+    if (adds.length > 1) {
+      const addsResult = adds.reduce((acc, el) => {
+        console.log("-----> acc:", acc);
+
+        return evalNoBrackets(acc, 0) + evalNoBrackets(el, 0);
+      });
+      console.log("addsResult:", addsResult);
+      return addsResult;
+    }
 
     const subs = expr.split("-");
     console.log("subs:", subs);
-    const subsResult = subs.reduce((acc, el) => evalNoBrackets(acc) - evalNoBrackets(el));
-    console.log("subsResult:", subsResult);
+    if (subs.length > 1) {
+      const subsResult = subs.reduce((acc, el) => evalNoBrackets(acc, 0) - evalNoBrackets(el, 0));
+      console.log("subsResult:", subsResult);
+      return subsResult;
+    }
 
     const multipliers = expr.split("*");
     console.log("multipliers:", multipliers);
-    const muliplyResult = multipliers.reduce((acc, el) => evalNoBrackets(acc) * evalNoBrackets(el));
-    console.log("muliplyResult:", muliplyResult);
+    if (multipliers.length > 1) {
+      const muliplyResult = multipliers.reduce(
+        (acc, el) => evalNoBrackets(acc, 1) * evalNoBrackets(el, 1)
+      );
+      console.log("muliplyResult:", muliplyResult);
+      return muliplyResult;
+    }
 
     const dividers = expr.split("/");
     console.log("dividers:", dividers);
-    const divideResult = dividers.reduce((acc, el) => evalNoBrackets(acc) / evalNoBrackets(el));
+    const divideResult = dividers.reduce(
+      (acc, el) => evalNoBrackets(acc, 1) / evalNoBrackets(el, 1)
+    );
     console.log("divideResult:", divideResult);
+    return divideResult;
   };
 
   const trimSigns = expr => {
@@ -73,7 +96,7 @@ function expressionCalculator(expr) {
   const calculateExpr = expr => {
     const isNested = findExprInBrackets(expr);
     if (!isNested) {
-      return evalNoBrackets(expr);
+      return evalNoBrackets(expr, 0);
     }
     const leftPart = expr.slice(0, isNested[1]);
     const trimmedLeftPart = trimSigns(leftPart);
@@ -82,18 +105,20 @@ function expressionCalculator(expr) {
     const trimmedRightPart = trimSigns(rightPart);
 
     return calculateExpr(
-      `${trimmedLeftPart[0]}${calculateExpr(trimmedLeftPart[1])}${trimmedLeftPart[2]}
-        ${calculateExpr(centralPart)}
-        ${trimmedRightPart[0]}${calculateExpr(trimmedRightPart[1])}${trimmedRightPart[2]}`
+      `${trimmedLeftPart[0]}${calculateExpr(trimmedLeftPart[1])}${
+        trimmedLeftPart[2]
+      }${calculateExpr(centralPart)}${trimmedRightPart[0]}${calculateExpr(trimmedRightPart[1])}${
+        trimmedRightPart[2]
+      }`
     );
   };
 
   return calculateExpr(expWithoutSpaces);
 }
 
-const yy = expressionCalculator("1 * (5 +    6 ) / ( 3-(    9+0) *3)");
+const yy = expressionCalculator("1 * (5 +    6 ) / ( 3-(    9+12) *8)");
 console.log("типа ответ:", yy);
-console.log(eval("1 * (5 +    6 ) / ( 3-(    9+0) *3)"));
+console.log(eval("1 * (5 +    6 ) / ( 3-(    9+0) *8)"));
 
 // module.exports = {
 //   expressionCalculator
